@@ -19,8 +19,23 @@ ActiveRecord::Schema.define(version: 20170420195020) do
     t.string   "status"
     t.integer  "runtime"
     t.date     "premiered"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.integer  "tvmaze_id"
+    t.string   "imdb_id"
+    t.string   "tvrage_id"
+    t.string   "thetvdb_id"
+    t.text     "summary"
+    t.integer  "network_id"
+    t.string   "language"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+    t.string   "medium_file_name"
+    t.string   "medium_content_type"
+    t.integer  "medium_file_size"
+    t.datetime "medium_updated_at"
+    t.string   "original_file_name"
+    t.string   "original_content_type"
+    t.integer  "original_file_size"
+    t.datetime "original_updated_at"
   end
 
 end
