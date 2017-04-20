@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  url: MyString
+  show_type: MyString
+  status: MyString
+  runtime: 1
+  premiered: 2017-04-20
+
+two:
+  name: MyString
+  url: MyString
+  show_type: MyString
+  status: MyString
+  runtime: 1
+  premiered: 2017-04-20
