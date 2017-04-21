@@ -45,13 +45,9 @@ end
 Operator = GraphQL::EnumType.define do
   name "Operators"
   description "SQL Operators for compiling query variables"
-  value "LIKE", "Like"
-  value "NEQ", "Not Equal"
-  value "EQ", "Equal"
-  value "GT", "Greater than"
-  value "LT", "Less than"
-  value "GTE", "Greater than or equal"
-  value "LTE", "Less than or equal"
+  OperatorPlugin.plugins.each do |plugin|
+    value plugin.operand, plugin.description
+  end
 end
 
 WhereInput = GraphQL::InputObjectType.define do
@@ -80,9 +76,8 @@ Types::QueryType = GraphQL::ObjectType.define do
 
     resolve -> (_, args, _) do
       if args[:where]
-        clause = InputObjectParser.new(args[:where]).parse
         resolver_scope = Show.unscoped
-        clause.each do |where|
+        Operations.new(args[:where]).parse!.each do |where|
           resolver_scope = resolver_scope.where(*where)
         end
         resolver_scope
