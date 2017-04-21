@@ -1,6 +1,19 @@
 class HelloWorldJob < ApplicationJob
   queue_as :default
 
+  def fetch_country params
+    country = Country.find_by_name params['name']
+    return country if country
+    Country.create! name: params['name'], code: params['code'], timezone: params['timezone']
+  end
+
+  def fetch_network params
+    network = Network.find_by_name params['name']
+    return network if network
+    country = fetch_country params['country']
+    Network.create! name: params['name'], country_id: country.id
+  end
+
   def perform(*args)
     Show.destroy_all
     url = 'http://api.tvmaze.com/search/shows'
@@ -16,6 +29,8 @@ class HelloWorldJob < ApplicationJob
         show['externals'] ||= {}
         show['network'] ||= {}
 
+        network = fetch_network(show['network']) if show['network'].present?
+
         Show.create!(
           name: show['name'],
           url: show['url'],
@@ -30,7 +45,7 @@ class HelloWorldJob < ApplicationJob
           tvrage_id: show['externals']['tvrage'],
           thetvdb_id: show['externals']['thetvdb'],
           summary: show['summary'],
-          network_id: show['network']['id'],
+          network_id: network.try(:id),
           language: show['language'],
         )
       end
