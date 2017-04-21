@@ -77,7 +77,7 @@ Types::QueryType = GraphQL::ObjectType.define do
     resolve -> (_, args, _) do
       if args[:where]
         resolver_scope = Show.unscoped
-        Operations.new(args[:where]).parse!.each do |where|
+        Operations.new(Show, args[:where]).parse!.each do |where|
           resolver_scope = resolver_scope.where(*where)
         end
         resolver_scope
