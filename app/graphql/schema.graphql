@@ -1,0 +1,114 @@
+# Generated programmatically from model: Country
+type Country implements Node {
+  code: String
+  created_at: Date
+  id: ID!
+  name: String
+  timezone: String
+  updated_at: Date
+}
+
+# Date since epoch in seconds
+scalar Date
+
+# Generated programmatically from model: Network
+type Network implements Node {
+  country: Country
+  country_id: Int
+  created_at: Date
+  id: ID!
+  name: String
+  updated_at: Date
+}
+
+# An object with an ID.
+interface Node {
+  # ID of the object.
+  id: ID!
+}
+
+# SQL Operators for compiling query variables
+enum Operators {
+  # SQL exact match with equal
+  EQ
+
+  # SQL greater-than match with >
+  GT
+
+  # SQL greater-than or equal match with >=
+  GTE
+
+  # SQL Fuzzy match using LIKE operand
+  LIKE
+
+  # SQL less-than match with <
+  LT
+
+  # SQL less-than or equal match with <=
+  LTE
+}
+
+type Query {
+  # Fetches an object given its ID.
+  node(
+    # ID of the object.
+    id: ID!
+  ): Node
+
+  # Fetches a list of objects given a list of IDs.
+  nodes(
+    # IDs of the objects.
+    ids: [ID!]!
+  ): [Node]!
+
+  # Find a Show by ID
+  show(id: ID!): Show
+  shows(
+    # The IDs of the shows
+    ids: [ID]
+
+    # The offset of shows to return
+    offset: Int
+
+    # The limit of shows to return
+    limit: Int
+
+    # Sample InputObjectType testing
+    where: [Where]
+  ): [Show]!
+}
+
+# Generated programmatically from model: Show
+type Show implements Node {
+  created_at: Date
+  id: ID!
+  imdb_id: String
+  language: String
+  medium_content_type: String
+  medium_file_name: String
+  medium_file_size: Int
+  medium_updated_at: Date
+  name: String
+  network: Network
+  network_id: Int
+  original_content_type: String
+  original_file_name: String
+  original_file_size: Int
+  original_updated_at: Date
+  premiered: Date
+  runtime: Int
+  show_type: String
+  status: String
+  summary: String
+  thetvdb_id: String
+  tvmaze_id: Int
+  tvrage_id: String
+  updated_at: Date
+  url: String
+}
+
+input Where {
+  field: String
+  value: String
+  operator: Operators
+}

@@ -23,15 +23,16 @@ end
 
 def create_type model_class
   GraphQL::ObjectType.define do
-    name(model_class.name)
-    description("Generated programmatically from model: #{model_class.name}")
+    name model_class.name
+    description "Generated programmatically from model: #{model_class.name}"
+
+    implements GraphQL::Relay::Node.interface
+    global_id_field :id
+
     # Make a field for each column:
     model_class.columns.each do |column|
-      if column.name == "id"
-        field("id", types.ID)
-      else
-        field(column.name, convert_type(column.type))
-      end
+      next if column.name == "id"
+      field(column.name, convert_type(column.type))
     end
 
     model_class.reflect_on_all_associations.each do |association|
@@ -51,7 +52,7 @@ Operator = GraphQL::EnumType.define do
 end
 
 WhereInput = GraphQL::InputObjectType.define do
-  name("Where")
+  name "Where"
   argument :field, types.String
   argument :value, types.String
   argument :operator, Operator
@@ -59,8 +60,11 @@ end
 
 Types::QueryType = GraphQL::ObjectType.define do
   name "Query"
-  # Add root-level fields here.
-  # They will be entry points for queries on your schema.
+
+  # Used by Relay to lookup objects by UUID:
+  field :node, GraphQL::Relay::Node.field
+  # # Fetches a list of objects given a list of IDs
+  field :nodes, GraphQL::Relay::Node.plural_field
 
   field :show do
     type MODEL_TO_TYPE[Show]
