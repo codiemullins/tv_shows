@@ -1,46 +1,44 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { gql, ApolloClient, createNetworkInterface, ApolloProvider, graphql } from 'react-apollo';
+import { ApolloClient, createNetworkInterface, ApolloProvider, graphql } from 'react-apollo';
+import Profile from './components/profile'
 
-// class Profile extends Component { ... }
-const Profile = ({data}) => (
-  <div>
-    <h1>Shows found {(data.shows || []).length}</h1>
-    {data.shows.each (show) => {
-      <li>{show.name}</li>
-    }}
-  </div>
-)
+import SHOW_QUERY from './graphql/show'
 
-// We use the gql tag to parse our query string into a query document
-const shows = gql`
-  query ($where: [Where]!) {
-    shows(where: $where) {
-      id
-      name
-      network {
-        name
-        country {
-          name
-        }
-      }
-      created_at
-      show_type
-      thetvdb_id
-      status
-    }
-  }
-`;
+const ITEMS_PER_PAGE = 20;
 
 const variables = {
-  where: [
-    {"field": "runtime", "value": "45", "operator": "GT" },
-    {"field": "runtime", "value": "61", "operator": "LT" },
-    {"field": "status", "value": "Running", "operator": "EQ"}
-  ]
+  // where: [
+  //   {"field": "runtime", "value": "45", "operator": "GT" },
+  //   {"field": "runtime", "value": "61", "operator": "LT" },
+  //   {"field": "status", "value": "Running", "operator": "EQ"}
+  // ],
+  offset: 0,
+  limit: ITEMS_PER_PAGE,
 }
 
-const ProfileWithData = graphql(shows, { options: { variables }})(Profile);
+const ProfileWithData = graphql(SHOW_QUERY, {
+  options: { variables },
+  props({ data: { loading, shows, fetchMore } }) {
+    return {
+      loading,
+      shows,
+      loadMoreEntries() {
+        return fetchMore({
+          variables: {
+            offset: shows.length,
+          },
+          updateQuery: (previousResult, { fetchMoreResult }) => {
+            if (!fetchMoreResult) { return previousResult; }
+            return Object.assign({}, previousResult, {
+              shows: [...previousResult.shows, ...fetchMoreResult.shows],
+            })
+          },
+        });
+      },
+    }
+  },
+})(Profile);
 
 export default class App extends React.Component {
   createClient() {
