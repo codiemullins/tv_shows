@@ -73,25 +73,13 @@ Types::QueryType = GraphQL::ObjectType.define do
     resolve -> (_, args, _) { Show.find(args["id"]) }
   end
 
-  field :shows do
-    type !types[MODEL_TO_TYPE[Show]]
-    argument :ids, types[types.ID], "The IDs of the shows"
-    argument :offset, types.Int, "The offset of shows to return"
-    argument :limit, types.Int, "The limit of shows to return"
+  connection :shows, MODEL_TO_TYPE[Show].connection_type do
     argument :where, types[WhereInput], "Sample InputObjectType testing"
 
     resolve -> (_, args, _) do
       resolver_scope = Show.unscoped
-      if args[:where]
-        Operations.new(Show, args[:where]).parse!.each do |where|
-          resolver_scope = resolver_scope.where(*where)
-        end
-      elsif args[:ids]
-        resolver_scope = Show.where(id: args[:ids])
-      end
-
-      resolver_scope = resolver_scope.offset(args[:offset]) if args[:offset]
-      resolver_scope = resolver_scope.limit(args[:limit]) if args[:limit]
+      resolver_scope = resolver_scope.where(*Operations.new(Show, args[:where]).parse!) if args[:where]
+      resolver_scope
     end
   end
 end
