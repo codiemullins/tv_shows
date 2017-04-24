@@ -1,11 +1,41 @@
+import Loading from './loading'
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { ApolloClient, createNetworkInterface, ApolloProvider, graphql } from 'react-apollo';
-import Profile from './components/profile'
 
-import SHOW_QUERY from './graphql/show'
+import SHOW_QUERY from '../graphql/show'
 
 const ITEMS_PER_PAGE = 20;
+
+class Shows extends React.Component {
+  render() {
+    const { loading, shows, fetchMore } = this.props;
+
+    return (
+      <div>
+        {loading ? <Loading /> : null}
+        <h1>Shows found {(shows || []).length}</h1>
+        <a onClick={fetchMore}>Load more</a>
+        <ul>
+
+          {(shows || []).map(show => (
+            <li key={show.id}>
+              {show.name}
+              { show.network ? (<span>
+                &nbsp;- <i>{show.network.name}</i>
+              </span>) : null }
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+}
+
+// Shows.propTypes = {
+//   loading: React.PropTypes.bool.isRequired,
+//   // feed: Feed.propTypes.entries,
+//   fetchMore: React.PropTypes.func,
+// };
 
 const variables = {
   // where: [
@@ -17,13 +47,13 @@ const variables = {
   limit: ITEMS_PER_PAGE,
 }
 
-const ProfileWithData = graphql(SHOW_QUERY, {
+const withData = graphql(SHOW_QUERY, {
   options: { variables },
   props({ data: { loading, shows, fetchMore } }) {
     return {
       loading,
       shows,
-      loadMoreEntries() {
+      fetchMore() {
         return fetchMore({
           variables: {
             offset: shows.length,
@@ -38,31 +68,6 @@ const ProfileWithData = graphql(SHOW_QUERY, {
       },
     }
   },
-})(Profile);
+});
 
-export default class App extends React.Component {
-  createClient() {
-    const csrfToken = document.head.querySelector('meta[name=csrf-token]').getAttribute('content');
-    // Initialize Apollo Client with URL to our server
-    return new ApolloClient({
-      networkInterface: createNetworkInterface({
-        uri: '/graphql',
-        opts: { credentials: 'same-origin', headers: { 'X-CSRF-Token': csrfToken } },
-      }),
-    });
-  }
-
-  render() {
-    return (
-      // Feed the client instance into your React component tree
-      <ApolloProvider client={this.createClient()}>
-        <ProfileWithData />
-      </ApolloProvider>
-    );
-  }
-}
-
-ReactDOM.render(
-  <App />,
-  document.getElementById('root')
-);
+export default withData(Shows);
