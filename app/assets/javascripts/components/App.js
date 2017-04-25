@@ -2,19 +2,10 @@ import React, { Component } from 'react';
 import {QueryRenderer} from 'react-relay/compat';
 import RelayClassic from 'react-relay/classic';
 
-import Shows from './Shows'
-
-const csrfToken = document.head.querySelector('meta[name=csrf-token]').getAttribute('content');
-RelayClassic.injectNetworkLayer(
-  new RelayClassic.DefaultNetworkLayer('/graphql', {
-    credentials: 'same-origin',
-    headers: {
-      'X-CSRF-Token': csrfToken,
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    }
-  })
-)
+import Loading from './Loading';
+import Shows from './Shows';
+// Need to require setup_network --- it sets authentication settings necessary for GraphQL
+import _ from '../setup_network';
 
 class App extends Component {
   render() {
@@ -33,7 +24,7 @@ class App extends Component {
         render={({error, props}) => {
           return (
             <div>
-              { props ? <Shows viewer={props.viewer} /> : null }
+              { props ? <Shows viewer={props.viewer} /> : <Loading /> }
             </div>
           )
         }}
