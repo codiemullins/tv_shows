@@ -36,7 +36,11 @@ def create_type model_class
     end
 
     model_class.reflect_on_all_associations.each do |association|
-      field(association.name, -> { MODEL_TO_TYPE[association.klass] })
+      field association.name, -> { MODEL_TO_TYPE[association.klass] } do
+        resolve ->(obj, args, ctx) {
+          RecordLoader.for(association.klass).load obj.send(association.foreign_key)
+        }
+      end
     end
   end
 end
@@ -68,7 +72,7 @@ ViewerType = GraphQL::ObjectType.define do
     type MODEL_TO_TYPE[Show]
     argument :id, !types.ID
     description "Find a Show by ID"
-    resolve -> (_, args, _) { Show.find(args["id"]) }
+    resolve -> (_, args, _) { RecordLoader.for(Show).load(args["id"]) }
   end
 
   connection :shows, MODEL_TO_TYPE[Show].connection_type do
