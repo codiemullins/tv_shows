@@ -48,6 +48,21 @@ enum Operators {
   LTE
 }
 
+# Information about pagination in a connection.
+type PageInfo {
+  # When paginating forwards, the cursor to continue.
+  endCursor: String
+
+  # When paginating forwards, are there more items?
+  hasNextPage: Boolean!
+
+  # When paginating backwards, are there more items?
+  hasPreviousPage: Boolean!
+
+  # When paginating backwards, the cursor to continue.
+  startCursor: String
+}
+
 type Query {
   # Fetches an object given its ID.
   node(
@@ -60,22 +75,7 @@ type Query {
     # IDs of the objects.
     ids: [ID!]!
   ): [Node]!
-
-  # Find a Show by ID
-  show(id: ID!): Show
-  shows(
-    # The IDs of the shows
-    ids: [ID]
-
-    # The offset of shows to return
-    offset: Int
-
-    # The limit of shows to return
-    limit: Int
-
-    # Sample InputObjectType testing
-    where: [Where]
-  ): [Show]!
+  viewer: User
 }
 
 # Generated programmatically from model: Show
@@ -105,6 +105,47 @@ type Show implements Node {
   tvrage_id: String
   updated_at: Date
   url: String
+}
+
+# The connection type for Show.
+type ShowConnection {
+  # A list of edges.
+  edges: [ShowEdge]
+
+  # Information to aid in pagination.
+  pageInfo: PageInfo!
+}
+
+# An edge in a connection.
+type ShowEdge {
+  # A cursor for use in pagination.
+  cursor: String!
+
+  # The item at the end of the edge.
+  node: Show
+}
+
+type User implements Node {
+  id: ID!
+
+  # Find a Show by ID
+  show(id: ID!): Show
+  shows(
+    # Returns the first _n_ elements from the list.
+    first: Int
+
+    # Returns the elements in the list that come after the specified global ID.
+    after: String
+
+    # Returns the last _n_ elements from the list.
+    last: Int
+
+    # Returns the elements in the list that come before the specified global ID.
+    before: String
+
+    # Sample InputObjectType testing
+    where: [Where]
+  ): ShowConnection
 }
 
 input Where {

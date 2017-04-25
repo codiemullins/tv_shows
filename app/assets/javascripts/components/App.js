@@ -1,36 +1,41 @@
 import React, { Component } from 'react';
-import {
-  QueryRenderer,
-  graphql,
-} from 'react-relay';
-
-import environment from '../createRelayEnvironment';
+import {QueryRenderer} from 'react-relay/compat';
+import RelayClassic from 'react-relay/classic';
 
 import Shows from './Shows'
+
+const csrfToken = document.head.querySelector('meta[name=csrf-token]').getAttribute('content');
+RelayClassic.injectNetworkLayer(
+  new RelayClassic.DefaultNetworkLayer('/graphql', {
+    credentials: 'same-origin',
+    headers: {
+      'X-CSRF-Token': csrfToken,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    }
+  })
+)
 
 class App extends Component {
   render() {
     return (
       <QueryRenderer
-        environment={environment}
+        environment={RelayClassic.Store}
         query={graphql`
-          query AppQuery($limit: Int!) {
-            shows(limit: $limit) {
-              name
+          query AppQuery($first: Int!) {
+            viewer {
+              id
+              ...Shows_viewer
             }
           }
         `}
-        variables={{
-          limit: 20,
-        }}
-
+        variables={{first: 20}}
         render={({error, props}) => {
-          if (error) {
-            return <div>{error.message}</div>;
-          } else if (props) {
-            return <Shows shows={props.shows} />;
-          }
-            return <div>Loading</div>;
+          return (
+            <div>
+              { props ? <Shows viewer={props.viewer} /> : null }
+            </div>
+          )
         }}
       />
     );

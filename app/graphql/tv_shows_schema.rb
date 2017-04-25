@@ -1,8 +1,9 @@
 TvShowsSchema = GraphQL::Schema.define do
-  query(Types::QueryType)
+  query Types::QueryType
 
   id_from_object ->(object, type_definition, query_ctx) {
-    GraphQL::Schema::UniqueWithinType.encode(type_definition.name, object.id)
+    id = object.respond_to?(:id) ? object.id : 42
+    GraphQL::Schema::UniqueWithinType.encode(type_definition.name, id)
   }
 
   object_from_id ->(id, query_ctx) {
@@ -10,7 +11,5 @@ TvShowsSchema = GraphQL::Schema.define do
     type_name.constantize.find(item_id)
   }
 
-  resolve_type ->(obj, ctx) {
-    MODEL_TO_TYPE[obj.class]
-  }
+  resolve_type ->(obj, ctx) { MODEL_TO_TYPE[obj.class] }
 end

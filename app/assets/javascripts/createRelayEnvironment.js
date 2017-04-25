@@ -5,10 +5,7 @@ const {
   Store,
 } = require('relay-runtime');
 
-// import Shows from './components/shows'
 const csrfToken = document.head.querySelector('meta[name=csrf-token]').getAttribute('content');
-
-console.log(csrfToken);
 
 // Define a function that fetches the results of an operation (query/mutation/etc)
 // and returns its results as a Promise:

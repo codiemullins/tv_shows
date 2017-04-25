@@ -3,8 +3,8 @@
  *   relay-compiler
  *
  * @providesModule AppQuery.graphql
- * @generated SignedSource<<eedbf914a830df1454e0dfdcdb2a0d09>>
- * @relayHash cfc9f28ec6b714f2d42abe3dc0229157
+ * @generated SignedSource<<5cd0e2c8d66547843e9b5fafbe1a9648>>
+ * @relayHash 8b172a37be3ea26480b55d575f550309
  * @flow
  * @nogrep
  */
@@ -20,9 +20,32 @@ import type {ConcreteBatch} from 'relay-runtime';
 
 /*
 query AppQuery(
-  $limit: Int!
+  $first: Int!
 ) {
-  shows(limit: $limit) {
+  viewer {
+    id
+    ...Shows_viewer
+  }
+}
+
+fragment Shows_viewer on User {
+  id
+  shows(first: $first) {
+    pageInfo {
+      hasNextPage
+    }
+    edges {
+      node {
+        id
+        ...Show_show
+      }
+    }
+  }
+}
+
+fragment Show_show on Show {
+  name
+  network {
     name
     id
   }
@@ -34,7 +57,7 @@ const batch /*: ConcreteBatch*/ = {
     "argumentDefinitions": [
       {
         "kind": "LocalArgument",
-        "name": "limit",
+        "name": "first",
         "type": "Int!",
         "defaultValue": null
       }
@@ -46,24 +69,22 @@ const batch /*: ConcreteBatch*/ = {
       {
         "kind": "LinkedField",
         "alias": null,
-        "args": [
-          {
-            "kind": "Variable",
-            "name": "limit",
-            "variableName": "limit",
-            "type": "Int"
-          }
-        ],
-        "concreteType": "Show",
-        "name": "shows",
-        "plural": true,
+        "args": null,
+        "concreteType": "User",
+        "name": "viewer",
+        "plural": false,
         "selections": [
           {
             "kind": "ScalarField",
             "alias": null,
             "args": null,
-            "name": "name",
+            "name": "id",
             "storageKey": null
+          },
+          {
+            "kind": "FragmentSpread",
+            "name": "Shows_viewer",
+            "args": null
           }
         ],
         "storageKey": null
@@ -79,7 +100,7 @@ const batch /*: ConcreteBatch*/ = {
     "argumentDefinitions": [
       {
         "kind": "LocalArgument",
-        "name": "limit",
+        "name": "first",
         "type": "Int!",
         "defaultValue": null
       }
@@ -91,30 +112,113 @@ const batch /*: ConcreteBatch*/ = {
       {
         "kind": "LinkedField",
         "alias": null,
-        "args": [
-          {
-            "kind": "Variable",
-            "name": "limit",
-            "variableName": "limit",
-            "type": "Int"
-          }
-        ],
-        "concreteType": "Show",
-        "name": "shows",
-        "plural": true,
+        "args": null,
+        "concreteType": "User",
+        "name": "viewer",
+        "plural": false,
         "selections": [
           {
             "kind": "ScalarField",
             "alias": null,
             "args": null,
-            "name": "name",
+            "name": "id",
             "storageKey": null
           },
           {
-            "kind": "ScalarField",
+            "kind": "LinkedField",
             "alias": null,
-            "args": null,
-            "name": "id",
+            "args": [
+              {
+                "kind": "Variable",
+                "name": "first",
+                "variableName": "first",
+                "type": "Int"
+              }
+            ],
+            "concreteType": "ShowConnection",
+            "name": "shows",
+            "plural": false,
+            "selections": [
+              {
+                "kind": "LinkedField",
+                "alias": null,
+                "args": null,
+                "concreteType": "PageInfo",
+                "name": "pageInfo",
+                "plural": false,
+                "selections": [
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "args": null,
+                    "name": "hasNextPage",
+                    "storageKey": null
+                  }
+                ],
+                "storageKey": null
+              },
+              {
+                "kind": "LinkedField",
+                "alias": null,
+                "args": null,
+                "concreteType": "ShowEdge",
+                "name": "edges",
+                "plural": true,
+                "selections": [
+                  {
+                    "kind": "LinkedField",
+                    "alias": null,
+                    "args": null,
+                    "concreteType": "Show",
+                    "name": "node",
+                    "plural": false,
+                    "selections": [
+                      {
+                        "kind": "ScalarField",
+                        "alias": null,
+                        "args": null,
+                        "name": "id",
+                        "storageKey": null
+                      },
+                      {
+                        "kind": "ScalarField",
+                        "alias": null,
+                        "args": null,
+                        "name": "name",
+                        "storageKey": null
+                      },
+                      {
+                        "kind": "LinkedField",
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "Network",
+                        "name": "network",
+                        "plural": false,
+                        "selections": [
+                          {
+                            "kind": "ScalarField",
+                            "alias": null,
+                            "args": null,
+                            "name": "name",
+                            "storageKey": null
+                          },
+                          {
+                            "kind": "ScalarField",
+                            "alias": null,
+                            "args": null,
+                            "name": "id",
+                            "storageKey": null
+                          }
+                        ],
+                        "storageKey": null
+                      }
+                    ],
+                    "storageKey": null
+                  }
+                ],
+                "storageKey": null
+              }
+            ],
             "storageKey": null
           }
         ],
@@ -122,7 +226,7 @@ const batch /*: ConcreteBatch*/ = {
       }
     ]
   },
-  "text": "query AppQuery(\n  $limit: Int!\n) {\n  shows(limit: $limit) {\n    name\n    id\n  }\n}\n"
+  "text": "query AppQuery(\n  $first: Int!\n) {\n  viewer {\n    id\n    ...Shows_viewer\n  }\n}\n\nfragment Shows_viewer on User {\n  id\n  shows(first: $first) {\n    pageInfo {\n      hasNextPage\n    }\n    edges {\n      node {\n        id\n        ...Show_show\n      }\n    }\n  }\n}\n\nfragment Show_show on Show {\n  name\n  network {\n    name\n    id\n  }\n}\n"
 };
 
 module.exports = batch;

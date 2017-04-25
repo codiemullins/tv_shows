@@ -58,13 +58,11 @@ WhereInput = GraphQL::InputObjectType.define do
   argument :operator, Operator
 end
 
-Types::QueryType = GraphQL::ObjectType.define do
-  name "Query"
+ViewerType = GraphQL::ObjectType.define do
+  name "User"
 
-  # Used by Relay to lookup objects by UUID:
-  field :node, GraphQL::Relay::Node.field
-  # # Fetches a list of objects given a list of IDs
-  field :nodes, GraphQL::Relay::Node.plural_field
+  implements GraphQL::Relay::Node.interface
+  global_id_field :id
 
   field :show do
     type MODEL_TO_TYPE[Show]
@@ -81,5 +79,22 @@ Types::QueryType = GraphQL::ObjectType.define do
       resolver_scope = resolver_scope.where(*Operations.new(Show, args[:where]).parse!) if args[:where]
       resolver_scope
     end
+  end
+
+end
+
+Types::QueryType = GraphQL::ObjectType.define do
+  name "Query"
+
+  # Used by Relay to lookup objects by UUID:
+  field :node, GraphQL::Relay::Node.field
+  # # Fetches a list of objects given a list of IDs
+  field :nodes, GraphQL::Relay::Node.plural_field
+
+
+  field :viewer, ViewerType do
+    resolve -> (obj, args, ctx) {
+      true
+    }
   end
 end
